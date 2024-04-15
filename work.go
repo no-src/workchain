@@ -18,7 +18,7 @@ func NewWork(do func(ctx context.Context) error) *Work {
 	}
 }
 
-func WithCond(w *Work, cond CondFunc) *Work {
+func (w *Work) WithCond(cond CondFunc) *Work {
 	w.cond = cond
 	return w
 }
@@ -29,19 +29,24 @@ func (w *Work) Do(ctx context.Context) error {
 		if cw == nil {
 			return nil
 		}
-		ok, ctx, err := cw.ok(ctx)
-		if err != nil {
-			return err
-		}
-		if !ok {
-			return nil
-		}
-		if cw.do != nil {
-			if err := cw.do(ctx); err != nil {
+		select {
+		case <-ctx.Done():
+			return ctx.Err()
+		default:
+			ok, ctx, err := cw.ok(ctx)
+			if err != nil {
 				return err
 			}
+			if !ok {
+				return nil
+			}
+			if cw.do != nil {
+				if err := cw.do(ctx); err != nil {
+					return err
+				}
+			}
+			cw = cw.next
 		}
-		cw = cw.next
 	}
 }
 
