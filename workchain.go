@@ -16,3 +16,12 @@ func WorkChain(works ...*Work) *Work {
 	}
 	return main
 }
+
+func WorkRing(works ...*Work) *Work {
+	w := WorkChain(works...)
+	if len(works) > 0 {
+		w.prev = works[len(works)-1]
+		w.prev.next = w
+	}
+	return w
+}
