@@ -1,18 +1,18 @@
-package main
+package example
 
 import (
 	"context"
 	"fmt"
+	"testing"
 
 	"github.com/no-src/workchain"
 )
 
-func main() {
+func TestHello(t *testing.T) {
 	helloWork := workchain.NewWork(hello)
 	worldWork := workchain.NewWork(world)
-	mainWork := workchain.WorkChain(helloWork, worldWork)
 	ctx := context.WithValue(context.Background(), "title", "workchain")
-	mainWork.Do(ctx)
+	workchain.WorkChain(helloWork, worldWork).Do(ctx)
 }
 
 func hello(ctx context.Context) error {
