@@ -26,8 +26,10 @@ func TestTrading(t *testing.T) {
 
 	workchain.WorkRing(
 		buy.WithCond(buyCond(30).Loop()),
-		sell.WithCond(sellCond(60).Loop())).
-		Do(ctx)
+		sell.WithCond(sellCond(60).Loop()),
+		buy.WithCond(buyCond(20).Loop()),
+		sell.WithCond(sellCond(70).Loop()),
+	).Do(ctx)
 
 	fmt.Println("trading stopped!")
 }

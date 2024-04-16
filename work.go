@@ -19,8 +19,9 @@ func NewWork(do func(ctx context.Context) error) *Work {
 }
 
 func (w *Work) WithCond(cond CondFunc) *Work {
-	w.cond = cond
-	return w
+	cw := *w
+	cw.cond = cond
+	return &cw
 }
 
 func (w *Work) Do(ctx context.Context) error {
