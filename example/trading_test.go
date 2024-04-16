@@ -10,13 +10,25 @@ import (
 	"github.com/no-src/workchain"
 )
 
-func TestTrading(t *testing.T) {
+func TestTrading_WorkChain(t *testing.T) {
 	buy := workchain.NewWork(buy)
 	sell := workchain.NewWork(sell)
 
-	ctx := context.WithValue(context.Background(), "code", "000001")
-	ctx = context.WithValue(ctx, "get_current_price", getCurrentPrice)
-	ctx, cancel := context.WithCancel(ctx)
+	ctx, _ := getTradingContext()
+
+	workchain.WorkChain(
+		buy.WithCond(buyCond(30).Loop()),
+		sell.WithCond(sellCond(60).Loop()),
+		buy.WithCond(buyCond(20).Loop()),
+		sell.WithCond(sellCond(70).Loop()),
+	).Do(ctx)
+}
+
+func TestTrading_(t *testing.T) {
+	buy := workchain.NewWork(buy)
+	sell := workchain.NewWork(sell)
+
+	ctx, cancel := getTradingContext()
 
 	go func() {
 		<-time.After(time.Second * 3)
@@ -32,6 +44,12 @@ func TestTrading(t *testing.T) {
 	).Do(ctx)
 
 	fmt.Println("trading stopped!")
+}
+
+func getTradingContext() (context.Context, context.CancelFunc) {
+	ctx := context.WithValue(context.Background(), "code", "000001")
+	ctx = context.WithValue(ctx, "get_current_price", getCurrentPrice)
+	return context.WithCancel(ctx)
 }
 
 func buy(ctx context.Context) error {
